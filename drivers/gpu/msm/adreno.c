@@ -1281,7 +1281,7 @@ static struct platform_driver adreno_platform_driver = {
 	.driver = {
 		.owner = THIS_MODULE,
 		.name = DEVICE_3D_NAME,
-//		.pm = &kgsl_pm_ops,
+		.pm = &kgsl_pm_ops,
 	}
 };
 

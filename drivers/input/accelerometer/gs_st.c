@@ -36,7 +36,7 @@ extern struct input_dev *sensor_dev;
 
 
 #ifdef GS_SENSOR_HW_T3
-#define X_AZIMUTH        270
+#define X_AZIMUTH        0
 #define Y_MIRROR         -1
 #else
 #define X_AZIMUTH        180 // {0, 90, 180, 270}

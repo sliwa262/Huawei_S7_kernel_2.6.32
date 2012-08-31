@@ -798,6 +798,8 @@ static int msm_fb_register(struct msm_fb_data_type *mfd)
 	var->rotate = 0,	/* angle we rotate counter clockwise */
 	mfd->op_enable = FALSE;
 
+	var->reserved[4] = 60; // msm fps info
+
 	switch (mfd->fb_imgType) {
 	case MDP_RGB_565:
 		fix->type = FB_TYPE_PACKED_PIXELS;

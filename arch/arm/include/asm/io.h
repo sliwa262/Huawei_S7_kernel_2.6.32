@@ -54,6 +54,10 @@ extern void __raw_readsl(const void __iomem *addr, void *data, int longlen);
 #define __raw_readw(a)		(__chk_io_ptr(a), *(volatile unsigned short __force *)(a))
 #define __raw_readl(a)		(__chk_io_ptr(a), *(volatile unsigned int __force   *)(a))
 
+
+#define writel_relaxed(v,c)     ((void)__raw_writel((__force u32) \
+                                        cpu_to_le32(v),__mem_pci(c)))
+
 /*
  * Architecture ioremap implementation.
  */

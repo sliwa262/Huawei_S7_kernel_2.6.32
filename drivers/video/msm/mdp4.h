@@ -417,4 +417,9 @@ int mdp_ppp_blit(struct fb_info *info, struct mdp_blit_req *req,
 int mdp_ppp_blit(struct fb_info *info, struct mdp_blit_req *req);                                            
 #endif
 
+
+int mdp4_mixer_info(int mixer_num, struct mdp_mixer_info *info);
+
 #endif /* MDP_H */
+
+

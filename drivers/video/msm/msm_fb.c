@@ -2498,13 +2498,47 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 		ret = msmfb_overlay_play_enable(info, argp);
 		up(&msm_fb_ioctl_ppp_sem);
 		break;
+#ifdef MSM_ROTATOR_IOCTL_CHECK
+        case MSMFB_ROTATOR_IOCTL_ROTATE:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_overlay_rotator(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
 #endif
-	case MSMFB_BLIT:
-		down(&msm_fb_ioctl_ppp_sem);
-		ret = msmfb_blit(info, argp);
-		up(&msm_fb_ioctl_ppp_sem);
 
-		break;
+	case MSMFB_OVERLAY_PLAY_WAIT: // case 00627432  QCT HDMI patch
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_overlay_play_wait(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
+
+	case MSMFB_OVERLAY_BLT:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_overlay_blt(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
+        case MSMFB_OVERLAY_BLT_OFFSET:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_overlay_blt_off(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
+        case MSMFB_OVERLAY_3D:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_overlay_3d_sbys(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
+        case MSMFB_MIXER_INFO:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_mixer_info(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+                break;
+#endif
+        case MSMFB_BLIT:
+                down(&msm_fb_ioctl_ppp_sem);
+                ret = msmfb_blit(info, argp);
+                up(&msm_fb_ioctl_ppp_sem);
+
+                break;
 
 	/* Ioctl for setting ccs matrix from user space */
 	case MSMFB_SET_CCS_MATRIX:
@@ -2801,6 +2835,28 @@ int __init msm_fb_init(void)
 #endif
 
 	return 0;
+}
+
+
+static int msmfb_mixer_info(struct fb_info *info, unsigned long *argp)
+{
+        int     ret, cnt;
+        struct msmfb_mixer_info_req req;
+
+        ret = copy_from_user(&req, argp, sizeof(req));
+        if (ret) {
+                pr_err("%s: failed\n", __func__);
+                return ret;
+        }
+
+        cnt = mdp4_mixer_info(req.mixer_num, req.info);
+        req.cnt = cnt;
+        ret = copy_to_user(argp, &req, sizeof(req));
+        if (ret)
+                pr_err("%s:msmfb_overlay_blt_off ioctl failed\n",
+                __func__);
+
+        return cnt;
 }
 
 module_init(msm_fb_init);

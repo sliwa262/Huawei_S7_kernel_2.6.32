@@ -223,10 +223,14 @@
 #define MSM_PMEM_SMI_SIZE	0x01500000
 
 #define MSM_FB_BASE		MSM_PMEM_SMI_BASE
+/*
 #define MSM_GPU_PHYS_BASE 	(MSM_FB_BASE + MSM_FB_SIZE)
 #define MSM_PMEM_SMIPOOL_BASE	(MSM_GPU_PHYS_BASE + MSM_GPU_PHYS_SIZE)
 #define MSM_PMEM_SMIPOOL_SIZE	(MSM_PMEM_SMI_SIZE - MSM_FB_SIZE \
 					- MSM_GPU_PHYS_SIZE)
+*/
+#define MSM_PMEM_SMIPOOL_BASE	(MSM_FB_BASE + MSM_FB_SIZE)
+#define MSM_PMEM_SMIPOOL_SIZE	(MSM_PMEM_SMI_SIZE - MSM_FB_SIZE)
 
 #define PMEM_KERNEL_EBI1_SIZE	0x28000
 
@@ -1662,7 +1666,7 @@ exit:
 #else
 #define bt_power_init(x) do {} while (0)
 #endif
-
+/*
 static struct resource kgsl_resources[] = {
        {
 		.name  = "kgsl_reg_memory",
@@ -1684,7 +1688,7 @@ static struct resource kgsl_resources[] = {
        },
 };
 static struct kgsl_platform_data kgsl_pdata = {
-	.high_axi_3d = 128000, /* Max for 8K */
+	.high_axi_3d = 128000, // Max for 8K 
 	.max_grp2d_freq = 0,
 	.min_grp2d_freq = 0,
 	.set_grp2d_async = NULL,
@@ -1695,7 +1699,66 @@ static struct kgsl_platform_data kgsl_pdata = {
 	.grp3d_clk_name = "grp_clk",
 	.grp2d_clk_name = NULL,
 };
+*/
+static struct resource kgsl_3d0_resources[] = {
+         {
+                 .name  = KGSL_3D0_REG_MEMORY,
+                 .start = 0xA0000000,
+                 .end = 0xA001ffff,
+                 .flags = IORESOURCE_MEM,
+         },/*
+         {
+                 .name   = "kgsl_phys_memory",
+                 .start = MSM_GPU_PHYS_BASE,
+                 .end = MSM_GPU_PHYS_BASE + MSM_GPU_PHYS_SIZE - 1,
+                 .flags = IORESOURCE_MEM,
+         },
+*/
+         {
+                 .name =/* "kgsl_yamato_irq",*/ KGSL_3D0_IRQ,
+                 .start = INT_GRAPHICS,
+                 .end = INT_GRAPHICS,
+                 .flags = IORESOURCE_IRQ,
+         },
 
+
+};
+
+static struct kgsl_device_platform_data kgsl_3d0_pdata = {
+    .pwr_data = {
+	.pwrlevel = {
+	    {
+		.gpu_freq = 128000000,
+		.bus_freq = 128000000,
+	    },
+	},
+	.init_level = 0,
+	.num_levels = 1,
+	.set_grp_async = NULL,
+	.idle_timeout = HZ/5,
+	.nap_allowed = true,
+    },
+    .clk = {
+	.name = {
+	    .clk = "grp_clk",
+	    .pclk = NULL,// "grp_pclk",
+	},
+    },
+    .imem_clk_name = {
+	.clk = "imem_clk",
+	.pclk = NULL,
+    },
+};
+static struct platform_device msm_kgsl_3d0 = {
+         .name = "kgsl-3d0",
+         .id = 0,
+         .num_resources = ARRAY_SIZE(kgsl_3d0_resources),
+         .resource = kgsl_3d0_resources,
+         .dev = {
+                 .platform_data = &kgsl_3d0_pdata,
+         },
+};
+/*
 static struct platform_device msm_device_kgsl = {
        .name = "kgsl",
        .id = -1,
@@ -1705,7 +1768,7 @@ static struct platform_device msm_device_kgsl = {
 		.platform_data = &kgsl_pdata,
 	},
 };
-
+*/
 static struct platform_device msm_device_pmic_leds = {
 	.name	= "pmic-leds",
 	.id	= -1,
@@ -3553,7 +3616,8 @@ static struct platform_device *devices[] __initdata = {
 	&msm_device_uart3,
 #endif
 	&msm_device_pmic_leds,
-	&msm_device_kgsl,
+//	&msm_device_kgsl,
+	&msm_kgsl_3d0,
 	&hs_device,
 #if defined(CONFIG_TSIF) || defined(CONFIG_TSIF_MODULE)
 	&msm_device_tsif,
@@ -3612,8 +3676,8 @@ static void __init qsd8x50_init_irq(void)
 
 static void kgsl_phys_memory_init(void)
 {
-	request_mem_region(kgsl_resources[1].start,
-		resource_size(&kgsl_resources[1]), "kgsl");
+	request_mem_region(kgsl_3d0_resources[1].start,
+		resource_size(&kgsl_3d0_resources[1]), "kgsl-3d");
 }
 
 static void usb_mpp_init(void)
@@ -4772,7 +4836,7 @@ static void __init qsd8x50_init(void)
 #endif
 
 	msm_pm_set_platform_data(msm_pm_data, ARRAY_SIZE(msm_pm_data));
-	kgsl_phys_memory_init();
+//	kgsl_phys_memory_init();
 
 #ifdef CONFIG_SURF_FFA_GPIO_KEYPAD
 	if (machine_is_qsd8x50_ffa() || machine_is_qsd8x50a_ffa())

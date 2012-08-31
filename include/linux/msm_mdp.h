@@ -18,6 +18,10 @@
 #include <linux/types.h>
 #include <linux/fb.h>
 
+#define MDP_BORDERFILL_SUPPORTED  0x00010000
+#define MDP_SECURE_OVERLAY_SESSION  0x00008000
+#define MDP_MEMORY_ID_TYPE_FB    0x00001000
+
 #define MSMFB_IOCTL_MAGIC 'm'
 #define MSMFB_GRP_DISP          _IOW(MSMFB_IOCTL_MAGIC, 1, unsigned int)
 #define MSMFB_BLIT              _IOW(MSMFB_IOCTL_MAGIC, 2, unsigned int)
@@ -42,21 +46,28 @@
 						struct mdp_overlay)
 #define MSMFB_OVERLAY_PLAY_ENABLE     _IOW(MSMFB_IOCTL_MAGIC, 141, unsigned int)
 
+#define MSMFB_OVERLAY_3D       _IOWR(MSMFB_IOCTL_MAGIC, 146, struct msmfb_overlay_3d)
+
 #define MDP_IMGTYPE2_START 0x10000
 
 enum {
+	NOTIFY_UPDATE_START,
+	NOTIFY_UPDATE_STOP,
 	MDP_RGB_565,      /* RGB 565 planer */
 	MDP_XRGB_8888,    /* RGB 888 padded */
 	MDP_Y_CBCR_H2V2,  /* Y and CbCr, pseudo planer w/ Cb is in MSB */
 	MDP_ARGB_8888,    /* ARGB 888 */
 	MDP_RGB_888,      /* RGB 888 planer */
 	MDP_Y_CRCB_H2V2,  /* Y and CrCb, pseudo planer w/ Cr is in MSB */
+        MDP_Y_CBCR_H2V2_ADRENO,
 	MDP_YCRYCB_H2V1,  /* YCrYCb interleave */
 	MDP_Y_CRCB_H2V1,  /* Y and CrCb, pseduo planer w/ Cr is in MSB */
 	MDP_Y_CBCR_H2V1,   /* Y and CrCb, pseduo planer w/ Cr is in MSB */
 	MDP_RGBA_8888,    /* ARGB 888 */
 	MDP_BGRA_8888,	  /* ABGR 888 */
 	MDP_RGBX_8888,	  /* RGBX 888 */
+	MDP_Y_CR_CB_H2V2,
+	MDP_Y_CB_CR_H2V2,
 	MDP_Y_CRCB_H2V2_TILE,  /* Y and CrCb, pseudo planer tile */
 	MDP_Y_CBCR_H2V2_TILE,  /* Y and CbCr, pseudo planer tile */
 	MDP_IMGTYPE_LIMIT,
@@ -77,6 +88,7 @@ enum {
 #define MDP_ROT_90 0x4
 #define MDP_ROT_180 (MDP_FLIP_UD|MDP_FLIP_LR)
 #define MDP_ROT_270 (MDP_ROT_90|MDP_FLIP_UD|MDP_FLIP_LR)
+#define MDP_ROT_MASK	0x7
 #define MDP_DITHER 0x8
 #define MDP_BLUR 0x10
 #define MDP_BLEND_FG_PREMULT 0x20000
@@ -103,6 +115,32 @@ enum {
 #define MDP_FB_PAGE_PROTECTION_INVALID           (5)
 /* Count of the number of MDP_FB_PAGE_PROTECTION_... values. */
 #define MDP_NUM_FB_PAGE_PROTECTION_VALUES        (5)
+
+
+#define MDP_Y_CR_CB_GH2V2      MDP_Y_CR_CB_H2V2
+#define MDP_OV_PLAY_NOWAIT 0x00200000
+#define FB_TYPE_3D_PANEL 0x10101010
+#define MDP_OV_PIPE_SHARE 0x00800000
+#define MDP_BACKEND_COMPOSITION 0x00040000
+#define MDP_SOURCE_ROTATED_90 0x00100000
+
+
+struct mdp_mixer_info {
+ int pndx;
+ int pnum;
+ int ptype;
+ int mixer_num;
+ int z_order;
+};
+
+#define MAX_PIPE_PER_MIXER  4
+
+struct msmfb_mixer_info_req {
+ int mixer_num;
+ int cnt;
+ struct mdp_mixer_info info[MAX_PIPE_PER_MIXER];
+};
+
 
 struct mdp_rect {
 	uint32_t x;
@@ -155,9 +193,49 @@ struct msmfb_data {
 	uint32_t offset;
 	int memory_id;
 	int id;
+        uint32_t flags;
+	uint32_t priv;
+};
+
+
+
+
+enum {
+ MDP_BLOCK_RESERVED = 0,
+ MDP_BLOCK_OVERLAY_0,
+ MDP_BLOCK_OVERLAY_1,
+ MDP_BLOCK_VG_1,
+ MDP_BLOCK_VG_2,
+ MDP_BLOCK_RGB_1,
+ MDP_BLOCK_RGB_2,
+ MDP_BLOCK_DMA_P,
+ MDP_BLOCK_DMA_S,
+ MDP_BLOCK_DMA_E,
+ MDP_BLOCK_MAX,
 };
 
 #define MSMFB_NEW_REQUEST -1
+
+#define MSMFB_OVERLAY_PLAY_WAIT _IOWR(MSMFB_IOCTL_MAGIC, 149, struct msmfb_overlay_data)
+#define MSMFB_MIXER_INFO _IOWR(MSMFB_IOCTL_MAGIC, 148, struct msmfb_mixer_info_req)
+
+#define MSMFB_OVERLAY_PLAY_WAIT _IOWR(MSMFB_IOCTL_MAGIC, 149, \
+						struct msmfb_overlay_data)
+
+#define MSMFB_WRITEBACK_INIT _IO(MSMFB_IOCTL_MAGIC, 150)
+#define MSMFB_WRITEBACK_REGISTER_BUFFER _IOW(MSMFB_IOCTL_MAGIC, 151, \
+						struct msmfb_writeback_data)
+#define MSMFB_WRITEBACK_UNREGISTER_BUFFER _IOW(MSMFB_IOCTL_MAGIC, 152, \
+						struct msmfb_writeback_data)
+#define MSMFB_WRITEBACK_QUEUE_BUFFER _IOW(MSMFB_IOCTL_MAGIC, 153, \
+						struct msmfb_data)
+#define MSMFB_WRITEBACK_DEQUEUE_BUFFER _IOW(MSMFB_IOCTL_MAGIC, 154, \
+						struct msmfb_data)
+#define MSMFB_WRITEBACK_TERMINATE _IO(MSMFB_IOCTL_MAGIC, 155)
+
+#define FB_TYPE_3D_PANEL 0x10101010
+#define MDP_IMGTYPE2_START 0x10000
+#define MSMFB_DRIVER_VERSION	0xF9E8D701
 
 struct msmfb_overlay_data {
 	uint32_t id;
@@ -169,6 +247,17 @@ struct msmfb_img {
 	uint32_t height;
 	uint32_t format;
 };
+struct dpp_ctrl {
+    /*
+     *'sharp_strength' has inputs = -128 <-> 127
+     *  Increasingly positive values correlate with increasingly sharper
+     *  picture. Increasingly negative values correlate with increasingly
+     *  smoothed picture.
+     */
+    int8_t sharp_strength;
+};
+
+
 
 struct mdp_overlay {
 	struct msmfb_img src;
@@ -181,6 +270,14 @@ struct mdp_overlay {
 	uint32_t flags;
 	uint32_t id;
 	uint32_t user_data[8];
+	struct dpp_ctrl dpp;
+
+};
+
+struct msmfb_overlay_3d {
+    uint32_t is_3d;
+    uint32_t width;
+    uint32_t height;
 };
 
 struct mdp_histogram {

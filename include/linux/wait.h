@@ -25,6 +25,29 @@
 #include <asm/system.h>
 #include <asm/current.h>
 
+
+
+#define __wait_io_event_interruptible_timeout(wq, condition, ret)       \
+do {                                                                    \
+        DEFINE_WAIT(__wait);                                            \
+                                                                        \
+        for (;;) {                                                      \
+                prepare_to_wait(&wq, &__wait, TASK_INTERRUPTIBLE);      \
+                if (condition)                                          \
+                        break;                                          \
+                if (!signal_pending(current)) {                         \
+                        ret = io_schedule_timeout(ret);                 \
+                        if (!ret)                                       \
+                                break;                                  \
+                        continue;                                       \
+                }                                                       \
+                ret = -ERESTARTSYS;                                     \
+                break;                                                  \
+        }                                                               \
+        finish_wait(&wq, &__wait);                                      \
+} while (0)
+
+
 typedef struct __wait_queue wait_queue_t;
 typedef int (*wait_queue_func_t)(wait_queue_t *wait, unsigned mode, int flags, void *key);
 int default_wake_function(wait_queue_t *wait, unsigned mode, int flags, void *key);

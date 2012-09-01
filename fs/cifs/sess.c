@@ -248,6 +248,7 @@ static void ascii_ssetup_strings(char **pbcc_area, struct cifsSesInfo *ses,
 		/* BB what about null user mounts - check that we do this BB */
 	} else { /* 300 should be long enough for any conceivable user name */
 		strncpy(bcc_ptr, ses->userName, 300);
+		bcc_ptr += strnlen(ses->userName, 300);
 	}
 	/* BB improve check for overflow */
 	bcc_ptr += strnlen(ses->userName, 300);

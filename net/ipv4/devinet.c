@@ -414,6 +414,23 @@ struct in_device *inetdev_by_index(struct net *net, int ifindex)
 	return in_dev;
 }
 
+
+static void inetdev_send_gratuitous_arp(struct net_device *dev,
+                                       struct in_device *in_dev)
+{
+       struct in_ifaddr *ifa = in_dev->ifa_list;
+
+       if (!ifa)
+               return;
+
+       arp_send(ARPOP_REQUEST, ETH_P_ARP,
+                ifa->ifa_address, dev,
+                ifa->ifa_address, NULL,
+                dev->dev_addr, NULL);
+}
+
+
+
 /* Called only from RTNL semaphored context. No locks. */
 
 struct in_ifaddr *inet_ifa_byprefix(struct in_device *in_dev, __be32 prefix,
@@ -1084,7 +1101,12 @@ static int inetdev_event(struct notifier_block *this, unsigned long event,
 		ip_mc_up(in_dev);
 		/* fall through */
 	case NETDEV_CHANGEADDR:
+		if (!IN_DEV_ARP_NOTIFY(in_dev))
+                       break;
+		/* fall through */
+
 		/* Send gratuitous ARP to notify of link change */
+		/*
 		if (IN_DEV_ARP_NOTIFY(in_dev)) {
 			struct in_ifaddr *ifa = in_dev->ifa_list;
 
@@ -1095,6 +1117,11 @@ static int inetdev_event(struct notifier_block *this, unsigned long event,
 					 dev->dev_addr, NULL);
 		}
 		break;
+		*/
+	case NETDEV_NOTIFY_PEERS:
+		inetdev_send_gratuitous_arp(dev, in_dev);
+		break;
+
 	case NETDEV_DOWN:
 		ip_mc_down(in_dev);
 		break;

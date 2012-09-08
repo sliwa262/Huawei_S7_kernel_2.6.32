@@ -198,11 +198,16 @@
 #endif
 #endif
 
-#define MSM_PMEM_SF_SIZE	0x1700000
+//#define MSM_PMEM_SF_SIZE	0x1700000
+#define MSM_PMEM_SF_SIZE 	0x1C99000
+
 
 #define SMEM_SPINLOCK_I2C	"S:6"
 
-#define MSM_PMEM_ADSP_SIZE	0x2B96000
+//#define MSM_PMEM_ADSP_SIZE	0x2B96000
+#define MSM_PMEM_ADSP_SIZE  0x1100000
+
+
 #ifdef CONFIG_MSM_HDMI
 #define MSM_FB_SIZE        0x2EE000 //0x800000  //0x500000  //0x2EE000  // modified for 24bits LCD display
 #else

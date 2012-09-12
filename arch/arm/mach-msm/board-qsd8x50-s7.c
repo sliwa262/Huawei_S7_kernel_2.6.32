@@ -209,9 +209,9 @@
 
 
 #ifdef CONFIG_MSM_HDMI
-#define MSM_FB_SIZE        0x2EE000 //0x800000  //0x500000  //0x2EE000  // modified for 24bits LCD display
+#define MSM_FB_SIZE       0xC00000 //0x2EE000 //0x800000  //0x500000  //0x2EE000  // modified for 24bits LCD display
 #else
-#define MSM_FB_SIZE        0x2EE000 //0x500000  //0x2EE000  // modified for 24bits LCD display
+#define MSM_FB_SIZE      0x780000  //0x2EE000 //0x500000  //0x2EE000  // modified for 24bits LCD display
 #endif
 #define MSM_AUDIO_SIZE		0x80000
 #define MSM_GPU_PHYS_SIZE 	SZ_2M

@@ -75,6 +75,9 @@ static int pdev_list_cnt;
 
 int vsync_mode = 1;
 
+#define MSM_FB_NUM      3
+
+
 #define MAX_FBI_LIST 32
 static struct fb_info *fbi_list[MAX_FBI_LIST];
 static int fbi_list_index;
@@ -792,7 +795,6 @@ static int msm_fb_register(struct msm_fb_data_type *mfd)
 	var->height = -1,	/* height of picture in mm */
 	var->width = -1,	/* width of picture in mm */
 #endif
-	var->reserved[4] = 60,
 	var->accel_flags = 0,	/* acceleration flags */
 	var->sync = 0,	/* see FB_SYNC_* */
 	var->rotate = 0,	/* angle we rotate counter clockwise */
@@ -938,6 +940,32 @@ static int msm_fb_register(struct msm_fb_data_type *mfd)
 	var->xres_virtual = panel_info->xres;
 	var->yres_virtual = panel_info->yres * mfd->fb_page;
 	var->bits_per_pixel = bpp * 8;	/* FrameBuffer color depth */
+//	var->reserved[4] = 60.0f;
+        if (mfd->dest == DISPLAY_LCD) {
+//                if (panel_info->type == MDDI_PANEL && panel_info->mddi.is_type1)
+//                        var->reserved[4] = panel_info->lcd.refx100 / (100 * 2);
+//                else
+                        var->reserved[4] = panel_info->lcd.refx100 / 100 * 2;
+        } else {
+//                if (panel_info->type == MIPI_VIDEO_PANEL) {
+//                        var->reserved[4] = panel_info->mipi.frame_rate;
+//                } else {
+                        var->reserved[4] = panel_info->clk_rate /
+                                ((panel_info->lcdc.h_back_porch +
+                                  panel_info->lcdc.h_front_porch +
+                                  panel_info->lcdc.h_pulse_width +
+                                  panel_info->xres) *
+                                 (panel_info->lcdc.v_back_porch +
+                                  panel_info->lcdc.v_front_porch +
+                                  panel_info->lcdc.v_pulse_width +
+                                  panel_info->yres));
+//                }
+        }
+
+
+	pr_debug("reserved[4] %u\n", var->reserved[4]);
+	MSM_FB_INFO("reserved[4] %u\n", var->reserved[4]);
+
 		/*
 		 * id field for fb app
 		 */
@@ -2733,6 +2761,25 @@ void msm_fb_add_device(struct platform_device *pdev)
 	if (!pdata)
 		return;
 	type = pdata->panel_info.type;
+
+
+#if defined MSM_FB_NUM
+        /*
+         * over written fb_num which defined
+         * at panel_info
+         *
+         */
+        if (type == HDMI_PANEL || type == DTV_PANEL || type == TV_PANEL /* || type == WRITEBACK_PANEL*/) {
+                        pdata->panel_info.fb_num = 1;
+        }
+        else pdata->panel_info.fb_num = MSM_FB_NUM;
+
+        MSM_FB_INFO("setting pdata->panel_info.fb_num to %d. type: %d\n",
+                        pdata->panel_info.fb_num, type);
+#endif
+
+
+
 	fb_num = pdata->panel_info.fb_num;
 
 	if (fb_num <= 0)

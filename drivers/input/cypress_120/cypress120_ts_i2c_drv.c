@@ -230,6 +230,7 @@ static void cypress120_report_event(struct cypress120_ts_i2c_platform_data *ts,
         input_report_abs(ts->input_dev, ABS_MT_TOUCH_MAJOR, 255);
 		input_report_abs(ts->input_dev, ABS_MT_POSITION_X, position[0][0]);
 		input_report_abs(ts->input_dev, ABS_MT_POSITION_Y, position[0][1]);
+		input_report_key(ts->input_dev, BTN_TOUCH, 1);
 		input_mt_sync(ts->input_dev);
 		input_sync(ts->input_dev); 
 

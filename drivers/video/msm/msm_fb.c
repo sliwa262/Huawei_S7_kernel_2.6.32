@@ -75,7 +75,9 @@ static int pdev_list_cnt;
 
 int vsync_mode = 1;
 
-#define MSM_FB_NUM      3
+#ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
+    #define MSM_FB_NUM      3
+#endif
 
 
 #define MAX_FBI_LIST 32
@@ -2485,6 +2487,31 @@ static void msmfb_set_color_conv(struct mdp_ccs *p)
 #endif
 
 
+
+static int msmfb_vsync_ctrl(struct fb_info *info, void __user *argp)
+{
+        int enable, ret;
+        struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)info->par;
+
+        ret = copy_from_user(&enable, argp, sizeof(enable));
+        if (ret) {
+                pr_err("%s:msmfb_overlay_vsync ioctl failed", __func__);
+                return ret;
+        }
+/*
+        if (mfd->vsync_ctrl)
+                mfd->vsync_ctrl(enable);
+        else {
+                pr_err("%s: Vsync IOCTL not supported", __func__);
+                return -EINVAL;
+        }
+*/
+//        mfd->use_mdp_vsync = 1;
+//	mfd->mdp_set_vsync(enable);
+        return 0;
+}
+
+
 static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
 			unsigned long arg)
 {
@@ -2567,6 +2594,11 @@ static int msm_fb_ioctl(struct fb_info *info, unsigned int cmd,
                 up(&msm_fb_ioctl_ppp_sem);
 
                 break;
+	case MSMFB_OVERLAY_VSYNC_CTRL:
+		down(&msm_fb_ioctl_ppp_sem);
+		ret = msmfb_vsync_ctrl(info, argp);
+		up(&msm_fb_ioctl_ppp_sem);
+		break;
 
 	/* Ioctl for setting ccs matrix from user space */
 	case MSMFB_SET_CCS_MATRIX:
@@ -2905,5 +2937,10 @@ static int msmfb_mixer_info(struct fb_info *info, unsigned long *argp)
 
         return cnt;
 }
+
+
+
+
+
 
 module_init(msm_fb_init);

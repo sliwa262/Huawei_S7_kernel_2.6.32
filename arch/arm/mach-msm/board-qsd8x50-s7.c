@@ -209,10 +209,19 @@
 
 
 #ifdef CONFIG_MSM_HDMI
-#define MSM_FB_SIZE       0xC00000 //0x2EE000 //0x800000  //0x500000  //0x2EE000  // modified for 24bits LCD display
+    #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
+	#define MSM_FB_SIZE	roundup(0xC00000,4096) //0x2EE000 //0x800000  //0x500000  //0x2EE000  // modified for 24bits LCD display
+    #else 
+	#define MSM_FB_SIZE	0x800000
+    #endif
 #else
-#define MSM_FB_SIZE      0x780000  //0x2EE000 //0x500000  //0x2EE000  // modified for 24bits LCD display
+    #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
+        #define MSM_FB_SIZE	roundup(0x780000,4096)  //0x2EE000 //0x500000  //0x2EE000  // modified for 24bits LCD display
+    #else
+	#define MSM_FB_SIZE	0x500000
+    #endif
 #endif
+
 #define MSM_AUDIO_SIZE		0x80000
 #define MSM_GPU_PHYS_SIZE 	SZ_2M
 

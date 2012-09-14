@@ -111,3 +111,6 @@ config MSM_KGSL_DISABLE_SHADOW_WRITES
 	bool "Disable register shadow writes for context switches"
 	default n
 	depends on MSM_KGSL
+config FB_MSM_TRIPLE_BUFFER
+	bool "Triple buffering"
+	default n

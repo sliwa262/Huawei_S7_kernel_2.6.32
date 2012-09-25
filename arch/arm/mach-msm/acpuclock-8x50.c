@@ -103,12 +103,13 @@ struct clkctl_acpu_speed acpu_freq_tbl_998[] = {
 	{ 0, 921600, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x18, 1300},
 	{ 0, 960000, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x19, 1300},
 	{ 1, 998400, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1A, 1300},
+#if 0
         { 1, 1036800, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1B, 1300},
         { 1, 1075200, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1C, 1300},
         { 1, 1113600, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1D, 1300},
         { 1, 1190400, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1E, 1300},
         { 1, 1228800, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1F, 1300},
-
+#endif
 
 #endif
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -156,12 +157,13 @@ struct clkctl_acpu_speed acpu_freq_tbl_998_8250[] = {
 	{ 0, 921600, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x18, 1300},
 	{ 0, 960000, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x19, 1300},
 	{ 1, 998400, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1A, 1300},
+#if 0
         { 1, 1036800, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1B, 1300},
         { 1, 1075200, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1C, 1300},
         { 1, 1113600, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1D, 1300},
         { 1, 1190400, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1E, 1300},
         { 1, 1228800, ACPU_PLL_3, 0, 0, 0, 0, 128000, 1, 0x1F, 1300},
-
+#endif
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 };
 
@@ -602,7 +604,7 @@ static void __init acpuclk_init(void)
 		}
 
 		/* Find the matching clock rate. */
-		for (speed = acpu_freq_tbl; speed->acpuclk_khz != 0; speed++) {
+		for (speed = acpu_freq_tbl; speed->acpuclk_khz != 0/* && speed->acpuclk_khz < 998400*/; speed++) {
 			if (speed->acpuclk_src_sel == sel &&
 			    speed->acpuclk_src_div == div)
 				break;
@@ -613,7 +615,7 @@ static void __init acpuclk_init(void)
 		sel = ((readl(SCPLL_FSM_CTL_EXT_ADDR) >> 3) & 0x3f);
 
 		/* Find the matching clock rate. */
-		for (speed = acpu_freq_tbl; speed->acpuclk_khz != 0 && speed->acpuclk_khz < 998400; speed++) {
+		for (speed = acpu_freq_tbl; speed->acpuclk_khz != 0/* && speed->acpuclk_khz < 998400*/; speed++) {
 			if (speed->sc_l_value == sel &&
 			    speed->sc_core_src_sel_mask == 1)
 				break;
@@ -701,7 +703,7 @@ static void __init acpu_freq_tbl_fixup(void)
 		break;
 	case 0x30:
 	case 0x00:
-		max_acpu_khz = 1113600; //998400; //1113600;
+		max_acpu_khz = 998400; //1228800; //998400; //1113600;
 		break;
 	case 0x10:
 		max_acpu_khz = 1267200;

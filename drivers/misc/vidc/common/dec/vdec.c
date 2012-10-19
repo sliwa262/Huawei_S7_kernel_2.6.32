@@ -541,6 +541,30 @@ static u32 vid_dec_get_frame_resolution(struct video_client_ctx *client_ctx,
 		return TRUE;
 }
 
+static u32 vid_dec_set_frame_rate(struct video_client_ctx *client_ctx,
+					struct vdec_framerate *frame_rate)
+{
+	struct vcd_property_hdr vcd_property_hdr;
+	struct vcd_property_frame_rate vcd_frame_rate;
+	u32 vcd_status = VCD_ERR_FAIL;
+
+	if (!client_ctx || !frame_rate)
+		return false;
+
+	vcd_property_hdr.prop_id = VCD_I_FRAME_RATE;
+	vcd_property_hdr.sz = sizeof(struct vcd_property_frame_rate);
+	vcd_frame_rate.fps_numerator = frame_rate->fps_numerator;
+	vcd_frame_rate.fps_denominator = frame_rate->fps_denominator;
+
+	vcd_status = vcd_set_property(client_ctx->vcd_handle,
+				      &vcd_property_hdr, &vcd_frame_rate);
+
+	if (vcd_status)
+		return false;
+	else
+		return true;
+}
+
 static u32 vid_dec_get_buffer_req(struct video_client_ctx *client_ctx,
 				  struct vdec_allocatorproperty *vdec_buf_req)
 {

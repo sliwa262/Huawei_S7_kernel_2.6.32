@@ -544,9 +544,11 @@ wait_for_int:
 			goto out_err;
 		}
 		if (dev->err) {
+#if 0
 			dev_err(dev->dev,
 				"Error during data xfer (%d)\n",
 				dev->err);
+#endif
 			ret = dev->err;
 			goto out_err;
 		}

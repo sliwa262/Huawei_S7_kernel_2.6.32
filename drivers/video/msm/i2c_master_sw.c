@@ -92,7 +92,9 @@ int hdmi_i2c_read_client_reg(byte saddr, byte client_reg,
     };  
     if (i2c_transfer(gHdmi_client->adapter, msgs, 2) < 0) 
     {
+#if 0
         printk(KERN_INFO "HDMI: hdmi_i2c_read_client_reg failed!\n");
+#endif
         return -EIO;
     }
     return 0;

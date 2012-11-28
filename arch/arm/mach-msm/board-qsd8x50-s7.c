@@ -199,8 +199,8 @@
 #endif
 
 //#define MSM_PMEM_SF_SIZE	0x1700000
-//#define MSM_PMEM_SF_SIZE 	0x1C99000
-#define MSM_PMEM_SF_SIZE	0x1B76000
+#define MSM_PMEM_SF_SIZE 	0x1C99000
+//#define MSM_PMEM_SF_SIZE	0x1B76000
 
 #define SMEM_SPINLOCK_I2C	"S:6"
 
@@ -795,6 +795,7 @@ static struct android_pmem_platform_data android_pmem_adsp_pdata = {
 	.allocator_type = PMEM_ALLOCATORTYPE_BITMAP,
 	.cached = 0,
 };
+#ifdef CONFIG_KERNEL_PMEM_SMI_REGION
 
 static struct android_pmem_platform_data android_pmem_smipool_pdata = {
 	.name = "pmem_smipool",
@@ -804,6 +805,7 @@ static struct android_pmem_platform_data android_pmem_smipool_pdata = {
 	.cached = 0,
 };
 
+#endif
 
 static struct platform_device android_pmem_device = {
 	.name = "android_pmem",
@@ -817,12 +819,14 @@ static struct platform_device android_pmem_adsp_device = {
 	.dev = { .platform_data = &android_pmem_adsp_pdata },
 };
 
+#ifdef CONFIG_KERNEL_PMEM_SMI_REGION
+
 static struct platform_device android_pmem_smipool_device = {
 	.name = "android_pmem",
 	.id = 2,
 	.dev = { .platform_data = &android_pmem_smipool_pdata },
 };
-
+#endif
 
 static struct platform_device android_pmem_kernel_ebi1_device = {
 	.name = "android_pmem",
@@ -3606,7 +3610,9 @@ static struct platform_device *devices[] __initdata = {
 #endif
 	&android_pmem_device,
 	&android_pmem_adsp_device,
+#ifdef CONFIG_KERNEL_PMEM_SMI_REGION
 	&android_pmem_smipool_device,
+#endif
 	&msm_device_nand,
 	&msm_device_i2c,
 	&device_gpio_i2c_adpt,

@@ -358,6 +358,8 @@ static int kgsl_suspend_device(struct kgsl_device *device, pm_message_t state)
 		return -EINVAL;
 
 	KGSL_PWR_WARN(device, "suspend start\n");
+        pr_err("kgsl suspend\n");
+
 
 	mutex_lock(&device->mutex);
 	nap_allowed_saved = device->pwrctrl.nap_allowed;
@@ -413,6 +415,7 @@ static int kgsl_resume_device(struct kgsl_device *device)
 	if (!device)
 		return -EINVAL;
 
+	pr_err("kgsl resume\n");
 	KGSL_PWR_WARN(device, "resume start\n");
 	mutex_lock(&device->mutex);
 	if (device->state == KGSL_STATE_SUSPEND) {
@@ -467,8 +470,8 @@ static int kgsl_runtime_resume(struct device *dev)
 }
 
 const struct dev_pm_ops kgsl_pm_ops = {
-//	.suspend = kgsl_suspend,
-//	.resume = kgsl_resume,
+	.suspend = kgsl_suspend,
+	.resume = kgsl_resume,
 	.runtime_suspend = kgsl_runtime_suspend,
 	.runtime_resume = kgsl_runtime_resume,
 };

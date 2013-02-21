@@ -392,6 +392,13 @@ void kgsl_pwrctrl_pwrrail(struct kgsl_device *device, int state)
 					"call internal_pwr_rail_ctl failed\n");
 				return;
 			}
+			if (internal_pwr_rail_mode(pwr->pwr_rail, PWR_RAIL_CTL_AUTO)) {
+				KGSL_DRV_ERR(device,
+                                        "call internal_pwr_rail_mode failed\n");
+                                return;
+                        }
+
+
 			if (pwr->gpu_reg)
 				regulator_disable(pwr->gpu_reg);
 		}
@@ -400,6 +407,13 @@ void kgsl_pwrctrl_pwrrail(struct kgsl_device *device, int state)
 			&pwr->power_flags)) {
 			KGSL_PWR_INFO(device,
 				"power on, device %d\n", device->id);
+
+                        if (internal_pwr_rail_mode(pwr->pwr_rail, PWR_RAIL_CTL_MANUAL)) {
+                                KGSL_DRV_ERR(device,
+                                        "call internal_pwr_rail_mode failed\n");
+                                return;
+                        }
+
 			if (internal_pwr_rail_ctl(pwr->pwr_rail, true)) {
 				KGSL_PWR_ERR(device,
 					"call internal_pwr_rail_ctl failed\n");
@@ -732,17 +746,20 @@ EXPORT_SYMBOL(kgsl_pwrctrl_wake);
 void kgsl_pwrctrl_enable(struct kgsl_device *device)
 {
 	/* Order pwrrail/clk sequence based upon platform */
-	kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_ON);
+//	kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_ON);
 	kgsl_pwrctrl_clk(device, KGSL_PWRFLAGS_ON);
 	kgsl_pwrctrl_axi(device, KGSL_PWRFLAGS_ON);
+	kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_ON);
+
 }
 EXPORT_SYMBOL(kgsl_pwrctrl_enable);
 
 void kgsl_pwrctrl_disable(struct kgsl_device *device)
 {
 	/* Order pwrrail/clk sequence based upon platform */
+//        kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_OFF);
 	kgsl_pwrctrl_axi(device, KGSL_PWRFLAGS_OFF);
 	kgsl_pwrctrl_clk(device, KGSL_PWRFLAGS_OFF);
-	kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_OFF);
+//	kgsl_pwrctrl_pwrrail(device, KGSL_PWRFLAGS_OFF);
 }
 EXPORT_SYMBOL(kgsl_pwrctrl_disable);

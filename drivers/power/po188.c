@@ -54,7 +54,7 @@
 #define PO188_RPC_CB_VERS	0x00010001
 #define SENSOR_POLLING_JIFFIES 1*HZ   //modify the time to 1 second
 #define START_SENSOR_POLLING_JIFFIES 15*HZ    //modify the time to 15 second
-#define MOD_SENSOR_POLLING_JIFFIES 30*HZ   // modify the time to 30 second
+#define MOD_SENSOR_POLLING_JIFFIES 10*HZ   // modify the time to 30 second
 #define RPC_TYPE_REQ     0
 #define RPC_TYPE_REPLY   1
 #define RPC_REQ_REPLY_COMMON_HEADER_SIZE   (3 * sizeof(uint32_t))
@@ -345,7 +345,7 @@ po188_wait_for_event(struct work_struct *work)
 		//input_sync(po188_driver.input_dev);
         input_report_rel(po188_driver.input_dev, REL_LIGHT,  po188_driver.voltage_now);			
 		input_sync(po188_driver.input_dev);
-		po188_driver.vol_flag = false; 
+		//po188_driver.vol_flag = false; 
         po188_driver.last_voltage = po188_driver.voltage_now;
 	}
 	//po188_driver.last_voltage = po188_driver.current_voltage;

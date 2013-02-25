@@ -198,9 +198,7 @@
 #endif
 #endif
 
-//#define MSM_PMEM_SF_SIZE	0x1700000
-#define MSM_PMEM_SF_SIZE 	0x1C99000
-//#define MSM_PMEM_SF_SIZE	0x1B76000
+#define MSM_PMEM_SF_SIZE	0x1700000
 
 #define SMEM_SPINLOCK_I2C	"S:6"
 
@@ -221,7 +219,7 @@
     #endif
 #endif
 */
-#define MSM_FB_SIZE 0x5DC000
+#define MSM_FB_SIZE 0xD00000
 
 #define MSM_AUDIO_SIZE		0x80000
 #define MSM_GPU_PHYS_SIZE 	SZ_2M
@@ -238,17 +236,33 @@
 #define MSM_PMEM_SMI_SIZE	0x01500000
 
 #define MSM_FB_BASE		MSM_PMEM_SMI_BASE
-
 #define MSM_GPU_PHYS_BASE 	(MSM_FB_BASE + MSM_FB_SIZE)
-/*
 #define MSM_PMEM_SMIPOOL_BASE	(MSM_GPU_PHYS_BASE + MSM_GPU_PHYS_SIZE)
 #define MSM_PMEM_SMIPOOL_SIZE	(MSM_PMEM_SMI_SIZE - MSM_FB_SIZE \
 					- MSM_GPU_PHYS_SIZE)
-*/
-#define MSM_PMEM_SMIPOOL_BASE	(MSM_FB_BASE + MSM_FB_SIZE)
-#define MSM_PMEM_SMIPOOL_SIZE	(MSM_PMEM_SMI_SIZE - MSM_FB_SIZE)
 
 #define PMEM_KERNEL_EBI1_SIZE	0x28000
+
+
+#define MSM_RAM_CONSOLE_BASE (MSM_PMEM_SMIPOOL_BASE + MSM_PMEM_SMIPOOL_SIZE)
+#define MSM_RAM_CONSOLE_SIZE    0x00040000
+
+
+
+static struct resource ram_console_resources[] = {
+        {
+                .start  = MSM_RAM_CONSOLE_BASE,
+                .end    = MSM_RAM_CONSOLE_BASE + MSM_RAM_CONSOLE_SIZE - 1,
+                .flags  = IORESOURCE_MEM,
+        },
+};
+
+static struct platform_device ram_console_device = {
+        .name           = "ram_console",
+        .id             = -1,
+        .num_resources  = ARRAY_SIZE(ram_console_resources),
+        .resource       = ram_console_resources,
+};
 
 #define PMIC_VREG_WLAN_LEVEL	2600
 #define PMIC_VREG_GP6_LEVEL	2900
@@ -3601,7 +3615,7 @@ static struct platform_device *devices[] __initdata = {
 #if defined(CONFIG_SMC91X) || defined(CONFIG_SMC91X_MODULE)
 	&smc91x_device,
 #endif	
-
+    &ram_console_device,
 	&msm_device_smd,
 	&msm_device_dmov,
 	&android_pmem_kernel_ebi1_device,

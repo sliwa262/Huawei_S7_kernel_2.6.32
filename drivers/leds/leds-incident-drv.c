@@ -272,6 +272,7 @@ static int DRV_LedDevIoctl(struct inode *inode, struct file *file,
             gpio_set_value(LED_GPIO_INCIDENT_LED, 0);
             break;
         case BSP_LED_E_FLASH:
+        case BSP_LED_E_BUTT:
             ulRet = copy_from_user((void *)&gsLedParam, (void __user *)arg, sizeof(gsLedParam));
             if(0 != ulRet)
             {

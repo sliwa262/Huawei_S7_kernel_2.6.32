@@ -204,6 +204,17 @@
 
 #define MSM_PMEM_ADSP_SIZE	0x2B96000
 
+#ifdef CONFIG_MSM_HDMI
+    #define MSM_HDMI_SIZE 0x300000
+#else
+    #define MSM_HDMI_SIZE 0
+#endif
+
+#ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
+    #define MSM_FB_SIZE (800 * 480 * 4 * 3) + MSM_HDMI_SIZE
+#else
+    #define MSM_FB_SIZE (800 * 480 * 4 * 2) + MSM_HDMI_SIZE
+#endif
 /*
 #ifdef CONFIG_MSM_HDMI
     #ifdef CONFIG_FB_MSM_TRIPLE_BUFFER
@@ -4026,7 +4037,7 @@ static struct mmc_platform_data qsd8x50_sdc1_data = {
 #endif
 	.msmsdcc_fmin	= 144000,
 	.msmsdcc_fmid	= 25000000,
-	.msmsdcc_fmax	= 49152000,
+	.msmsdcc_fmax	= 64000000,
 	.nonremovable	= 0,
 };
 #endif

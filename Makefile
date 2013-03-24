@@ -525,6 +525,8 @@ endif # $(dot-config)
 # Defaults vmlinux but it is usually overridden in the arch makefile
 all: vmlinux
 
+KBUILD_CFLAGS   += -march=armv7-a -mtune=cortex-a8 -mfpu=vfpv3
+
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os
 else

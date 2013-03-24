@@ -4055,7 +4055,7 @@ static struct mmc_platform_data qsd8x50_sdc2_data = {
 #endif
 	.msmsdcc_fmin	= 144000,
 	.msmsdcc_fmid	= 25000000,
-	.msmsdcc_fmax	= 49152000,
+	.msmsdcc_fmax	= 64000000,
 	.nonremovable	= 1,
 };
 
@@ -4300,7 +4300,7 @@ static struct mmc_platform_data qsd8x50_wlan_data = {
 #endif
 	.msmsdcc_fmin	= 144000,
 	.msmsdcc_fmid	= 25000000,
-	.msmsdcc_fmax	= 49152000,
+	.msmsdcc_fmax	= 64000000,
 	.nonremovable	= 1,
 	.status			= qsd8x50_wlan_status,
 	.register_status_notify	= qsd8x50_register_status_notify,
@@ -4379,7 +4379,7 @@ static struct mmc_platform_data qsd8x50_sdc3_data = {
 #endif
 	.msmsdcc_fmin	= 144000,
 	.msmsdcc_fmid	= 25000000,
-	.msmsdcc_fmax	= 49152000,//25000000,
+	.msmsdcc_fmax	= 64000000,//25000000,
 	.nonremovable	= 1,
 };
 #endif
@@ -4395,7 +4395,7 @@ static struct mmc_platform_data qsd8x50_sdc4_data = {
 #endif
 	.msmsdcc_fmin	= 144000,
 	.msmsdcc_fmid	= 25000000,
-	.msmsdcc_fmax	= 49152000,
+	.msmsdcc_fmax	= 64000000,
 	.nonremovable	= 0,
 };
 #endif

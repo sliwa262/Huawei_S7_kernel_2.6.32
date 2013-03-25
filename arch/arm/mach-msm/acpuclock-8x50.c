@@ -49,7 +49,7 @@
 #define dprintk(msg...) \
 	cpufreq_debug_printk(CPUFREQ_DEBUG_DRIVER, "cpufreq-msm", msg)
 
-//#define OPTIONAL_OC 1
+#define OPTIONAL_OC 1
 
 enum {
 	ACPU_PLL_TCXO	= -1,

@@ -40,6 +40,9 @@ extern uint32 mdp_intr_mask;
 extern spinlock_t mdp_spin_lock;
 extern struct mdp4_statistic mdp4_stat;
 
+#define VSYNC_PERIOD         16
+
+
 #define MDP4_NONBLOCKING
 
 #ifdef CONFIG_FB_MSM_OVERLAY

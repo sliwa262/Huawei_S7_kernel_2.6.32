@@ -64,8 +64,8 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
   echo \#define UTS_VERSION \"`echo $UTS_VERSION | $UTS_TRUNCATE`\"
 
   echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
-  echo \#define LINUX_COMPILE_BY \"asturel\"
-  echo \#define LINUX_COMPILE_HOST \"asturel.hu\"
+  echo \#define LINUX_COMPILE_BY \"sliwa262\"
+  echo \#define LINUX_COMPILE_HOST \"wp.pl\"
 
   if [ -x /bin/dnsdomainname ]; then
     domain=`dnsdomainname 2> /dev/null`
